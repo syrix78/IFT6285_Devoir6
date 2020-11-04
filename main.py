@@ -34,12 +34,14 @@ from sklearn.pipeline import Pipeline
 import seaborn as sns
 
 
-
 NB_pipeline = Pipeline([
                 ('tfidf', TfidfVectorizer()),
                 ('clf', OneVsRestClassifier(MultinomialNB(
                     fit_prior=True, class_prior=None))),
             ])
+
+
+
 
 #Training time and accuracy
 
