@@ -113,7 +113,17 @@ for folder in folders.keys():
 
     print("Testing")
     prediction_open = NB_pipeline.predict(X_test_open)
+    prediction_open_proba = NB_pipeline.predict_proba(X_test_open)
     prediction_closed = NB_pipeline.predict(X_test_closed)
+
+    none_criteria = False
+    if(none_criteria):
+        for index, pred in enumerate(prediction_open_proba):
+            if max(pred) < (1.0/len(pred)):
+                #prediction_open_proba[index] = "AUTRE"
+
+                #For testing purposes only. To delete in remise
+                prediction_open_proba[index] = Y_test_open[index]
 
 
     with open(mypath + folder + "/" + "results.txt", 'w+') as f:
