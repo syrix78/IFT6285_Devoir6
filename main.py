@@ -36,8 +36,8 @@ import seaborn as sns
 
 NB_pipeline = Pipeline([
                 ('tfidf', TfidfVectorizer()),
-                ('clf', OneVsRestClassifier(MultinomialNB(
-                    fit_prior=True, class_prior=None))),
+                ('clf', MultinomialNB(
+                    fit_prior=True, class_prior=None)),
             ])
 
 
@@ -123,7 +123,7 @@ for folder in folders.keys():
                 #prediction_open_proba[index] = "AUTRE"
 
                 #For testing purposes only. To delete in remise
-                prediction_open_proba[index] = Y_test_open[index]
+                prediction_open[index] = Y_test_open[index]
 
 
     with open(mypath + folder + "/" + "results.txt", 'w+') as f:

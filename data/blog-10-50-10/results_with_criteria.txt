@@ -1,0 +1,1 @@
+Training time: 0.07881927490234375Test open accuracy is 0.4Test closed accuracy is 0.39
