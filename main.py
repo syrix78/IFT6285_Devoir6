@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
 from sklearn.multiclass import OneVsRestClassifier
@@ -35,17 +36,29 @@ import seaborn as sns
 
 
 NB_pipeline = Pipeline([
-                ('tfidf', TfidfVectorizer()),
-                ('clf', MultinomialNB(
-                    fit_prior=True, class_prior=None)),
-            ])
+    ('vect', TfidfVectorizer(stop_words=stopwords.words('english'))),
+    ('tfidf', TfidfTransformer()),
+    ('clf', MultinomialNB(
+        fit_prior=True, class_prior=None)),
+])
 
+LinearSVC_pipeline = Pipeline([
+    ('vect', TfidfVectorizer(stop_words=stopwords.words('english'))),
+    ('tfidf', TfidfTransformer()),
+    ('clf', LinearSVC()),
+])
+
+logReg_pipeline = Pipeline(
+    [('vect', TfidfVectorizer(stop_words=stopwords.words('english'))),
+     ('tfidf', TfidfTransformer()),
+     ('clf', LogisticRegression(max_iter=1000)),
+     ])
 
 
 
 #Training time and accuracy
 
-mypath = "./data/"
+mypath = "./quiz/"
 
 dir = []
 for (dirpath, dirnames, filenames) in walk(mypath):
@@ -108,29 +121,33 @@ for folder in folders.keys():
     Y_test_closed = [row[0] for row in test_closed_arr]
     print("Training")
     depart = time.time()
-    NB_pipeline.fit(X_train, Y_train)
+    LinearSVC_pipeline.fit(X_train, Y_train)
     train_time = time.time() - depart
 
     print("Testing")
-    prediction_open = NB_pipeline.predict(X_test_open)
-    prediction_open_proba = NB_pipeline.predict_proba(X_test_open)
-    prediction_closed = NB_pipeline.predict(X_test_closed)
+    prediction_open = LinearSVC_pipeline.predict(X_test_open)
+    prediction_closed = LinearSVC_pipeline.predict(X_test_closed)
 
+    # Only works for naive bayes and some other classifiers
+    #prediction_open_proba = NB_pipeline.predict_proba(X_test_open)
+    prediction_open_proba = []
     none_criteria = False
     if(none_criteria):
         for index, pred in enumerate(prediction_open_proba):
             if max(pred) < (1.0/len(pred)):
-                #prediction_open_proba[index] = "AUTRE"
+                prediction_open_proba[index] = "AUTRE"
 
-                #For testing purposes only. To delete in remise
-                prediction_open[index] = Y_test_open[index]
+                #For testing purposes only. To delete in final
+                #prediction_open[index] = Y_test_open[index]
 
+    with open('test-open.quiz', 'w+') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator = '\n')
+        for p in prediction_open:
+            writer.writerow([p])
 
-    with open(mypath + folder + "/" + "results.txt", 'w+') as f:
-
-        f.write("Training time: {}".format(train_time))
-        f.write('Test open accuracy is {}'.format(accuracy_score(Y_test_open, prediction_open)))
-        f.write('Test closed accuracy is {}'.format(accuracy_score(Y_test_closed, prediction_closed)))
-
+    with open('test-closed.quiz', 'w+') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator = '\n')
+        for p in prediction_closed:
+            writer.writerow([p])
 
 
