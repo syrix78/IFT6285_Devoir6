@@ -1,8 +1,12 @@
+#Lucas Hornung, Quentin Wolak
 import csv
 import sys
 
+#Uncomment for OSX/Linux
 maxInt = sys.maxsize
-
+csv.field_size_limit(maxInt)
+#Uncomment for Windows
+"""
 while True:
     # decrease the maxInt value by factor 10
     # as long as the OverflowError occurs.
@@ -12,6 +16,7 @@ while True:
         break
     except OverflowError:
         maxInt = int(maxInt/10)
+"""
 import re
 import time
 from os import walk
